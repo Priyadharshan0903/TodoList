@@ -1,12 +1,16 @@
 import './App.css';
-import Button from "./components/button";
 import Items from "./components/Items";
 import Input from "./components/Input";
 import { useState } from "react";
+import SwipeToDelete from 'react-swipe-to-delete-component';
+import 'react-swipe-to-delete-component/dist/swipe-to-delete.css';
+
+
 
 function App() {
   const [openAdd, setopenAdd] = useState(false);
   const [items, setItems] = useState([]);
+  const [all, setAll] = useState(true);
   async function onAdd(txt) {
     if (txt !== "") {
       const exist = items.find(el => el.text === txt);
@@ -34,6 +38,12 @@ function App() {
     )
 
   }
+  function onDelete(txt) {
+    setItems(
+      items.filter(el=>el.text!==txt)
+    )
+    
+  }
   return (
     <div id="whole" className=' bg-gradient-to-r from-cyan-100 to-blue-300'>
       <div id="app" className='grid h-screen w-screen place-items-center'>
@@ -46,17 +56,25 @@ function App() {
           </div>
          <div id="container" className=' rounded-lg bg-white h-5/6 mx-5'>
          <div id="commands" className=" rounded-t h-1/6 w-6/6 flex justify-around">
-                <Button name="Mark Undone" />
+                <button className="rounded m-1  w-full  text-white text-lg bg-sky-700 " onClick={() => setAll(!all)}>
+                  {all ? "Show Undone" : "Show All"}</button>
                 <button className="rounded m-1  w-full  text-white text-lg bg-sky-700" onClick={()=>setopenAdd(true)}>Add new</button>
           </div>
           <div id='divideLine' className='w-full border-t border-b border-gray-300'></div>
-             <div id="toDoItems" className='overflow-y-scroll h-5/6 bg-white'>
-                {
+              <div id="toDoItems" className='overflow-y-scroll h-5/6 bg-white'>
+                {all ?
                   items.map((el) => (
-                    <Items text={el.text} check={el.check} onCheck={onCheck} />
+                    <SwipeToDelete key={el.text}  onDelete={()=>onDelete(el.text)}>
+                    <Items text={el.text} check={el.check} onCheck={onCheck} /></SwipeToDelete>))
+                  :
+                  items.map((el) => (
+                    !el.check ?
+                      <SwipeToDelete key={el.text} onDelete={()=>onDelete(el.text)}>
+                      <Items text={el.text} check={el.check} onCheck={onCheck} /></SwipeToDelete>
+                      :
+                      ""
                   ))
-             }
-                {/* <Items text="hello" check={false} /> */}
+                }
            </div>
         </div>
         <div className="text-center text-white font-bold">Be Productive</div>
